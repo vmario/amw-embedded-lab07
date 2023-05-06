@@ -6,28 +6,17 @@
 #define THERMOSTAT_HEATER_PORT PORTD ///< Rejestr wyjściowy elementu sterującego.
 #define THERMOSTAT_HEATER_LED PD3 ///< Pin elementu sterującego.
 
-Thermostat::Thermostat():
-	targetTemperature{20.0}
+Thermostat::Thermostat(const Settings& settings):
+	settings{settings}
 {
 	THERMOSTAT_HEATER_DDR |= _BV(THERMOSTAT_HEATER_LED);
 }
 
-double Thermostat::target() const
-{
-	return targetTemperature;
-}
-
-void Thermostat::target(double targetTemperature)
-{
-	this->targetTemperature = targetTemperature;
-}
-
 void Thermostat::onTemperature(double currentTemperature) const
 {
-	if (targetTemperature > currentTemperature) {
+	if (settings.target > currentTemperature) {
 		THERMOSTAT_HEATER_PORT &= ~_BV(THERMOSTAT_HEATER_LED);
 	} else {
 		THERMOSTAT_HEATER_PORT |= _BV(THERMOSTAT_HEATER_LED);
-
 	}
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "settings.hpp"
+
 /**
  * Sterownik termostatu.
  */
@@ -7,17 +9,7 @@ struct Thermostat {
 	/**
 	 * Konstruktor.
 	 */
-	Thermostat();
-
-	/**
-	 * Odczytuje zadaną temperaturę.
-	 */
-	double target() const;
-
-	/**
-	 * Ustawia zadaną temperaturę.
-	 */
-	void target(double targetTemperature);
+	Thermostat(const Settings& settings);
 
 	/**
 	 * Zdarzenie odczytu temperatury.
@@ -27,5 +19,5 @@ struct Thermostat {
 	void onTemperature(double currentTemperature) const;
 
 private:
-	double targetTemperature; ///< Zadana temperatura.
+	const Settings& settings; ///< Nastawy.
 };
