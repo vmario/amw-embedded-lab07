@@ -41,7 +41,7 @@ static volatile bool expired; ///< Czy timer ustawił flagę?
 ISR(TIMER0_COMPA_vect)
 {
 	static uint32_t interval;
-	if (++interval > SYSTEM_TICK_INTERVAL) {
+	if (++interval > SYSTEM_TICK_INTERVAL / 5) {
 		interval = 0;
 		expired = true;
 	}

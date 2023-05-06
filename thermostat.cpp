@@ -24,4 +24,10 @@ void Thermostat::target(double targetTemperature)
 
 void Thermostat::onTemperature(double currentTemperature) const
 {
+	if (targetTemperature > currentTemperature) {
+		THERMOSTAT_HEATER_PORT &= ~_BV(THERMOSTAT_HEATER_LED);
+	} else {
+		THERMOSTAT_HEATER_PORT |= _BV(THERMOSTAT_HEATER_LED);
+
+	}
 }

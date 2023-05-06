@@ -44,10 +44,10 @@ static void printTemperature(const Lcd& lcd)
  * @param lcd Sterownik LCD.
  * @param thermostat Sterownik termostatu.
  */
-static void printTarget(const Lcd& lcd, const Thermostat& thermostat)
+static void printTarget(const Lcd& lcd, const Thermostat& thermostat, char cursor)
 {
 	char buffer[17];
-	snprintf(buffer, sizeof(buffer), "Ttarget  =%6.2f", thermostat.target());
+	snprintf(buffer, sizeof(buffer), "Ttarget  %c%6.2f", cursor, thermostat.target());
 	lcd.write(buffer);
 }
 
@@ -57,7 +57,7 @@ static void printTarget(const Lcd& lcd, const Thermostat& thermostat)
  * @param lcd Sterownik LCD.
  * @param thermostat Sterownik termostatu.
  */
-static void lcdRefresh(const Lcd& lcd, const Thermostat& thermostat)
+static void lcdRefresh(const Lcd& lcd, const Thermostat& thermostat, char cursor)
 {
 	if (!Thermometer{}.reset()) {
 		lcd.clear();
@@ -68,7 +68,7 @@ static void lcdRefresh(const Lcd& lcd, const Thermostat& thermostat)
 	lcd.goTo(0, 0);
 	printTemperature(lcd);
 	lcd.goTo(1, 0);
-	printTarget(lcd, thermostat);
+	printTarget(lcd, thermostat, cursor);
 }
 
 /**
@@ -80,9 +80,26 @@ static void lcdRefresh(const Lcd& lcd, const Thermostat& thermostat)
  */
 void onSystemTick(const Lcd& lcd, Thermostat& thermostat)
 {
+	static bool lastSwitch = false;
+	static char cursor = '=';
+
 	thermostat.onTemperature(Thermometer{}.temperature());
-	thermostat.target(thermostat.target() + 0.1 * encoder.pop());
-	lcdRefresh(lcd, thermostat);
+	if (lastSwitch != encoder.isSwitchPressed()) {
+		lastSwitch = encoder.isSwitchPressed();
+		if (lastSwitch) {
+			if (cursor == '=') {
+				cursor = '>';
+			} else {
+				cursor = '=';
+			}
+		}
+	}
+	if (cursor == '>') {
+		thermostat.target(thermostat.target() + 0.1 * encoder.pop());
+	} else {
+		encoder.pop();
+	}
+	lcdRefresh(lcd, thermostat, cursor);
 }
 
 /**
